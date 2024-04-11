@@ -49,7 +49,6 @@ const loginForm = document.getElementById('login-form');
 const logout = document.getElementById('logout');
 let loginEmail;
 
-console.log(signUpForm, loginForm);
 
 if (document.title == "Jukebox Quiz - Home") {
 
@@ -58,19 +57,19 @@ if (document.title == "Jukebox Quiz - Home") {
     e.preventDefault();
 
     let signUpEmail = document.getElementById('signup-email').value;
-
+    let signUpUserName = document.getElementById('signup-user').value;
     // //almacenamos ese email en LOCALSTORAGE
-    // let guardar = JSON.parse(localStorage.getItem("mails"));
-    // let mail = [{ email: signUpEmail }];
+    let guardar = JSON.parse(localStorage.getItem("mails"));
+    let mail = { email: signUpEmail, username: signUpUserName};
 
-    // if (guardar === null) {
-    //   localStorage.setItem("mails", JSON.stringify(mail));
-    // } else {
-    //   let newEmail = { email: signUpEmail };
-
-    //   guardar.push(newEmail);
-    //   localStorage.setItem("mails", JSON.stringify(guardar));
-    // }
+    if (guardar === null) {
+      localStorage.setItem("mails", JSON.stringify(mail));
+      guardar.push(mail);
+      localStorage.setItem("mails", JSON.stringify(guardar));
+    } else {
+      guardar.push(mail);
+      localStorage.setItem("mails", JSON.stringify(guardar));
+    };
 
 
     const signUpPassword = document.getElementById('signup-pass').value;
@@ -105,8 +104,7 @@ if (document.title == "Jukebox Quiz - Home") {
       console.log('Error: ', error)
     }
 
-  })
-
+  });
 
   //Login function
   loginForm.addEventListener('submit', async (e) => {
@@ -267,9 +265,7 @@ if (document.title == "Jukebox Quiz - Home") {
     }
   })
 
-
 }
-
 
 
 //// ______________ FUNCIONES _____________________
@@ -325,7 +321,7 @@ function submitForm() {
       date: fecha,
       scores: score
     };
-
+    console.log("A ver que hay de raro aqui con los registrados: ",data);
     setDoc(docRef, data)
       .then(docRef => {
         console.log("A New Document Field has been added to an existing document");
@@ -333,9 +329,7 @@ function submitForm() {
       })
       .catch(error => {
         console.log(error);
-      })
-
-
+    });
   });
 };
 
