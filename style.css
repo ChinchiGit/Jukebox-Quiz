@@ -206,10 +206,19 @@ nav{
     margin-bottom: auto;
 }
 
-#mute{
+.muteButton{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+#mute, #logoutButton{
     display:flex;
     align-items: center;
 }
+
+
 
 .iconLabel{
     width: 60px;
@@ -240,6 +249,7 @@ nav{
 .audio{
     display:none
 }
+
 
 
 /* RESULTS.HTML*/

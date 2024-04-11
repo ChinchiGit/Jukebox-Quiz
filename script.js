@@ -587,6 +587,20 @@ if (document.title === "Jukebox Quiz - Home") {
 }
 
 
+//BOTON LOGOUT NAVBAR
 
+if (document.title === "Quiz" || document.title === 'Jukebox Quiz - Results' ){
+  const logout = document.getElementById("logoutButton");
+  logout.addEventListener('click', () => {
+    console.log("Pinchando Logout")
+    signOut(auth).then(() => {
+      console.log('Logout user')
+      alert("Hope to see you soon!")
+      window.location.href = './index.html';
+    }).catch((error) => {
+      console.log('Error: ', error)
+    });
+  })
+}
 
 
