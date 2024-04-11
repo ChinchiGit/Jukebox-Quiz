@@ -28,7 +28,7 @@
             </nav>
     </header>
     <main>
-        <section id = "contenedorPreguntas"></section>
+        <section id = "contenedorPreguntas">
             <form action="" class="formulario" id="formulario">
             
                 <!--la clase de los labels es igual para poder usarlo en el css pero también tiene un ID por si queremos darles un estilo personalizado a cada uno-->
@@ -37,12 +37,13 @@
 
                             
             </form>
+            <article id = "nextBack">
+                <button type="click" value="Back" class="quizbutton" id="back"> Back</button>       
+                <button type="click" value="Next" class="quizbutton" id="next">Next </button>
+            </article>
         </section>
         
-        <section id = "nextBack">
-            <button type="click" value="Back" class="quizbutton" id="back"> Back</button>       
-            <button type="click" value="Next" class="quizbutton" id="next">Next </button>
-        </section>
+
     </main>
     
     <audio class="audio" src="./assets/audio/audio01.mp3" autoplay loop controls></audio>

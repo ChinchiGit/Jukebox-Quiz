@@ -195,9 +195,9 @@ nav{
 
 }
 
-#formulario{
+/* #formulario{
     height: 50vh;
-}
+} */
 
 #container{
     display: flex;
@@ -345,14 +345,12 @@ th{
 }
 
 @media only screen and (min-width: 768px) {
-    body {
-        margin-top: 60px;
-    }
+
     main{
         display: flex;
         flex-direction: row;
         align-items: stretch;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: space-around;
 
     }
@@ -379,6 +377,7 @@ th{
         flex-direction: column;
         justify-content: space-around;
         align-items: center;
+        width: 45%;
     }
 
     #scoresBox2{
@@ -453,7 +452,7 @@ th{
     max-width: 1000px;
     text-align: center;
     margin:auto;
-    margin-top: 100px;
+    margin-top: 10px;
    }
 
    #scoresBox {

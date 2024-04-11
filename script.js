@@ -489,7 +489,7 @@ if (document.title === 'Jukebox Quiz - Results') {
             <tr>
               <td>${doc.data().username}</td>
               <td>${doc.data().date}</td>
-              <td>${doc.data().scores}" of 10"</td>
+              <td>${doc.data().scores} of 10</td>
             </tr>
           `).join('')}
         </tbody>
