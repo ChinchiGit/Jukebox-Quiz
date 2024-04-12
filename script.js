@@ -35,8 +35,15 @@ let correctas = [];
 let userName = "";
 let page = 0;
 let score = 0;
-let fecha = new Date;
-fecha = fecha.toLocaleDateString();
+let fecha = new Date();
+
+let dia = String(fecha.getDate()).padStart(2, '0');
+let mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript empiezan en 0
+let ano = fecha.getFullYear();
+fecha = dia + '/' + mes + '/' + ano;
+
+
+
 
 
 
@@ -46,6 +53,9 @@ fecha = fecha.toLocaleDateString();
 
 const signUpForm = document.getElementById('signup-form');
 const loginForm = document.getElementById('login-form');
+const userData = document.getElementById('user-data');
+const bienvenida = document.getElementById("bienvenida");
+const scoresBox = document.getElementById("scoresBox");
 const logout = document.getElementById('logout');
 let loginEmail;
 
@@ -60,7 +70,7 @@ if (document.title == "Jukebox Quiz - Home") {
     let signUpUserName = document.getElementById('signup-user').value;
     // //almacenamos ese email en LOCALSTORAGE
     let guardar = JSON.parse(localStorage.getItem("mails"));
-    let mail = { email: signUpEmail, username: signUpUserName};
+    let mail = { email: signUpEmail, username: signUpUserName };
 
     if (guardar === null) {
       localStorage.setItem("mails", JSON.stringify(mail));
@@ -84,7 +94,6 @@ if (document.title == "Jukebox Quiz - Home") {
           console.log('User registered')
           const user = userCredential.user;
           signUpForm.reset();
-          let userData = document.getElementById('user-data');
           userData.style.cssText = 'display:block; background-color: #73AB84;width: 50%;margin: 2rem auto;padding: 1rem;border-radius: 5px;display: flex;flex-direction: column;align-items: center';
           userData.innerHTML = `<h3>Welcome!</h3>
                               <p>Username: ${signUpUser}</p>
@@ -160,24 +169,8 @@ if (document.title == "Jukebox Quiz - Home") {
 
           //GRAFICA USUARIO LOGUEADO
 
-
-          // let localData = JSON.parse(localStorage.getItem('mails'));
-          // console.log(localData);
           let fechasGrafica = [];
           let scoreGrafica = [];
-          // for (let i = 0; i < localData.length; i++) {
-          //   if (localData[i]["email"] == loginEmail) {
-          //     fechasGrafica.push(localData[i]["fecha"]);
-          //     scoreGrafica.push(localData[i]["score"]);
-          //   };
-
-          // }
-
-          // for (let j = 0; j < scoreGrafica; j++) {
-          //   scoreGrafica[j].split(",", 4);
-          // };
-
-
           // Initialize Firestore
           const db = getFirestore();
 
@@ -185,7 +178,7 @@ if (document.title == "Jukebox Quiz - Home") {
           let partidasRef = collection(db, "partidas");
 
           // Query to get documents where "email" is equal to the logged in user's email
-          let q = query(partidasRef, where("email", "==", loginEmail));
+          let q = query(partidasRef, where("email", "==", loginEmail), orderBy("date", "asc"));
 
           // Execute the query
           getDocs(q).then((querySnapshot) => {
@@ -197,7 +190,7 @@ if (document.title == "Jukebox Quiz - Home") {
               scoreGrafica.push(doc.data().scores);
             });
 
-            console.log(fechasGrafica, scoreGrafica);
+
 
 
 
@@ -205,7 +198,7 @@ if (document.title == "Jukebox Quiz - Home") {
             new Chart(ctx, {
               type: 'bar',
               data: {
-                labels: [`${fechasGrafica[0]}`, `${fechasGrafica[1]}`, `${fechasGrafica[2]}`, `${fechasGrafica[3]}`],
+                labels: [`${fechasGrafica[0].toLocaleDateString()}`, `${fechasGrafica[1].toLocaleDateString()}`, `${fechasGrafica[2].toLocaleDateString()}`, `${fechasGrafica[3].toLocaleDateString()}`],
                 datasets: [{
                   label: 'Correct Answers',
                   data: [`${scoreGrafica[0]}`, `${scoreGrafica[1]}`, `${scoreGrafica[2]}`, `${scoreGrafica[3]}`],
@@ -244,23 +237,79 @@ if (document.title == "Jukebox Quiz - Home") {
       });
   })
 
-  //Logout function
-  logout.addEventListener('click', () => {
-    let userData = document.getElementById('user-data');
-    signOut(auth).then(() => {
-      console.log('Logout user')
-      userData.style.cssText = '';
-      userData.innerHTML = ``;
-    }).catch((error) => {
-      console.log('Error: ', error)
-    });
-  })
 
-  //Observe the user's state
+  // Check if user is logged in
   auth.onAuthStateChanged(user => {
     if (user) {
+      let mails = JSON.parse(localStorage.getItem('mails'));
+      let currentUser = mails[mails.length - 1];
+      userData.style.cssText = 'display: block; background-color: #ffcfd2; width: 75%; margin: auto; padding: 5px;';
+      userData.innerHTML = `<h3>Take another round!</h3>
+                              <p>Username: ${currentUser.username}</p>
+                              <p>Email: ${currentUser.email}</p>
+                              <p>Are you ready?</p>
+                              <button id="startQuiz"class="quizbutton" type="click"><a href="./question.html">Play!</a></button>`
+      userData.style.display = "block";
+      document.getElementById("registrar").style.display = "none";
+      document.getElementById("login-form").style.display = "none";
+      document.getElementById("scoresBox").style.display = "block";
       console.log('Logged user');
+      //GRAFICA USUARIO LOGUEADO
+
+      let fechasGrafica = [];
+      let scoreGrafica = [];
+      // Initialize Firestore
+      const db = getFirestore();
+
+      // Reference to the "partidas" collection
+      let partidasRef = collection(db, "partidas");
+
+      // Query to get documents where "email" is equal to the logged in user's email
+      let q = query(partidasRef, where("email", "==", user.email), orderBy("date", "asc"));
+
+      // Execute the query
+      getDocs(q).then((querySnapshot) => {
+        console.log(q);
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, " => ", doc.data());
+          // Extract date and score and add them to fechasGrafica and scoreGrafica
+          fechasGrafica.push(doc.data().date);
+          scoreGrafica.push(doc.data().scores);
+        });
+
+        console.log(fechasGrafica, scoreGrafica);
+
+
+
+        const ctx = document.getElementById('myChart');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [`${fechasGrafica[0]}`, `${fechasGrafica[1]}`, `${fechasGrafica[2]}`, `${fechasGrafica[3]}`],
+            datasets: [{
+              label: 'Correct Answers',
+              data: [`${scoreGrafica[0]}`, `${scoreGrafica[1]}`, `${scoreGrafica[2]}`, `${scoreGrafica[3]}`],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            aspectRatio: 1 | 1,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+
+      });
+
+
+
     } else {
+      bienvenida.style.display = "block";
+      scoresBox.style.display = "none";
       console.log('No logged user');
     }
   })
@@ -321,7 +370,6 @@ function submitForm() {
       date: fecha,
       scores: score
     };
-    console.log("A ver que hay de raro aqui con los registrados: ",data);
     setDoc(docRef, data)
       .then(docRef => {
         console.log("A New Document Field has been added to an existing document");
@@ -329,7 +377,7 @@ function submitForm() {
       })
       .catch(error => {
         console.log(error);
-    });
+      });
   });
 };
 
@@ -495,6 +543,69 @@ if (document.title === 'Jukebox Quiz - Results') {
 
 //// ______________ BOTONES _____________________
 
+
+//BOTON REGISTRAR
+if (document.title === "Jukebox Quiz - Home") {
+  const cuadroLogin = document.querySelector("#login-form");
+  const cuadroRegistrar = document.querySelector("#signup-form");
+  const botonRegistrar = document.querySelector("#registrar");
+
+  botonRegistrar.addEventListener("click", function () {
+
+    cuadroLogin.style.display = "none";
+
+    botonRegistrar.style.display = "none";
+
+
+    cuadroRegistrar.style.display = "block";
+  });
+
+}
+
+
+
+//BOTON PLAY AS GUEST
+if (document.title === "Jukebox Quiz - Home") {
+ 
+ 
+  const playAsGuestButton = document.getElementById("playAsGuest");
+
+  playAsGuestButton.addEventListener("click", () => {
+    signInWithEmailAndPassword(auth, "invitado@juqueboxquiz.com", "invitado")
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+  });
+
+
+
+}
+
+//BOTON LOGOUT NAVBAR
+
+if (document.title === "Quiz" || document.title === 'Jukebox Quiz - Results') {
+  const logout = document.getElementById("logoutButton");
+  logout.addEventListener('click', () => {
+    console.log("Pinchando Logout")
+    signOut(auth).then(() => {
+      console.log('Logout user')
+      alert("Hope to see you soon!")
+      window.location.href = './index.html';
+    }).catch((error) => {
+      console.log('Error: ', error)
+    });
+  })
+}
+
+
+
+
 // FUNCIONALIDAD BOTON MUTE
 if (document.title === 'Quiz' || document.title === 'Jukebox Quiz - Results') {
   let audio = document.getElementsByClassName("audio");
@@ -568,39 +679,8 @@ if (document.title === 'Jukebox Quiz - Results') {
 }
 
 
-//BOTON REGISTRAR
-if (document.title === "Jukebox Quiz - Home") {
-  const cuadroLogin = document.querySelector("#login-form");
-  const cuadroRegistrar = document.querySelector("#signup-form");
-  const botonRegistrar = document.querySelector("#registrar");
-
-  botonRegistrar.addEventListener("click", function () {
-
-    cuadroLogin.style.display = "none";
-
-    botonRegistrar.style.display = "none";
 
 
-    cuadroRegistrar.style.display = "block";
-  });
 
-}
-
-
-//BOTON LOGOUT NAVBAR
-
-if (document.title === "Quiz" || document.title === 'Jukebox Quiz - Results' ){
-  const logout = document.getElementById("logoutButton");
-  logout.addEventListener('click', () => {
-    console.log("Pinchando Logout")
-    signOut(auth).then(() => {
-      console.log('Logout user')
-      alert("Hope to see you soon!")
-      window.location.href = './index.html';
-    }).catch((error) => {
-      console.log('Error: ', error)
-    });
-  })
-}
 
 
