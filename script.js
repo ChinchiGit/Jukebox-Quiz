@@ -91,7 +91,7 @@ if (document.title == "Jukebox Quiz - Home") {
       //Create auth user
       await createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
         .then((userCredential) => {
-          console.log('User registered')
+          console.log('User Signed In!')
           const user = userCredential.user;
           signUpForm.reset();
           userData.style.cssText = 'display:block; background-color: #73AB84;width: 50%;margin: 2rem auto;padding: 1rem;border-radius: 5px;display: flex;flex-direction: column;align-items: center';
@@ -123,16 +123,14 @@ if (document.title == "Jukebox Quiz - Home") {
 
     const loginPassword = document.getElementById('login-pass').value;
     let userData = document.getElementById('user-data');
-    console.log(userData);
     //Call the collection in the DB
     const docRef = doc(db, "users", loginEmail);
     //Search a document that matches with our ref
     const docSnap = await getDoc(docRef);
 
     signInWithEmailAndPassword(auth, loginEmail, loginPassword)
-      .then((userCredential) => {
-        console.log(userCredential);
-        console.log('User authenticated')
+      .then(() => {
+        console.log('User Signed In!')
         loginForm.reset();
       })
       .then(() => {
@@ -147,7 +145,7 @@ if (document.title == "Jukebox Quiz - Home") {
                               <button id="startQuiz"class="quizbutton" type="click"><a href="./question.html">Play!</a></button>
                              `
           userData.style.display = "block";
-          document.getElementById("registrar").style.display = "none";
+          document.getElementById("playAsGuest").style.display = "none";
           document.getElementById("login-form").style.display = "none";
           document.getElementById("scoresBox").style.display = "block";
 
@@ -182,9 +180,7 @@ if (document.title == "Jukebox Quiz - Home") {
 
           // Execute the query
           getDocs(q).then((querySnapshot) => {
-            console.log(q);
             querySnapshot.forEach((doc) => {
-              console.log(doc.id, " => ", doc.data());
               // Extract date and score and add them to fechasGrafica and scoreGrafica
               fechasGrafica.push(doc.data().date);
               scoreGrafica.push(doc.data().scores);
@@ -198,7 +194,7 @@ if (document.title == "Jukebox Quiz - Home") {
             new Chart(ctx, {
               type: 'bar',
               data: {
-                labels: [`${fechasGrafica[0].toLocaleDateString()}`, `${fechasGrafica[1].toLocaleDateString()}`, `${fechasGrafica[2].toLocaleDateString()}`, `${fechasGrafica[3].toLocaleDateString()}`],
+                labels: [`${fechasGrafica[0]}`, `${fechasGrafica[1]}`, `${fechasGrafica[2]}`, `${fechasGrafica[3]}`],
                 datasets: [{
                   label: 'Correct Answers',
                   data: [`${scoreGrafica[0]}`, `${scoreGrafica[1]}`, `${scoreGrafica[2]}`, `${scoreGrafica[3]}`],
@@ -250,10 +246,10 @@ if (document.title == "Jukebox Quiz - Home") {
                               <p>Are you ready?</p>
                               <button id="startQuiz"class="quizbutton" type="click"><a href="./question.html">Play!</a></button>`
       userData.style.display = "block";
-      document.getElementById("registrar").style.display = "none";
+      document.getElementById("playAsGuest").style.display = "none";
       document.getElementById("login-form").style.display = "none";
       document.getElementById("scoresBox").style.display = "block";
-      console.log('Logged user');
+      console.log('User Signed In!');
       //GRAFICA USUARIO LOGUEADO
 
       let fechasGrafica = [];
@@ -269,16 +265,12 @@ if (document.title == "Jukebox Quiz - Home") {
 
       // Execute the query
       getDocs(q).then((querySnapshot) => {
-        console.log(q);
         querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
+
           // Extract date and score and add them to fechasGrafica and scoreGrafica
           fechasGrafica.push(doc.data().date);
           scoreGrafica.push(doc.data().scores);
         });
-
-        console.log(fechasGrafica, scoreGrafica);
-
 
 
         const ctx = document.getElementById('myChart');
@@ -330,7 +322,6 @@ function submitForm() {
     let respuesta = document.querySelector(`input[name=answer]:checked`).value;
     if (respuesta == "r3") {
       score++
-      console.log(score);
     }
 
     let playersMails = JSON.parse(localStorage.getItem("mails"));
@@ -338,12 +329,10 @@ function submitForm() {
 
     let playerUserName = [];
     const user = auth.currentUser;
-    console.log("Objeto user: ", user)
     const userRef = doc(db, 'users', user.email);
     const userDoc = await getDoc(userRef);
     if (userDoc.exists()) {
       playerUserName.push(userDoc.data().username);
-      console.log("Esto es lo que tratamos de guardar: ", playerUserName)
     }
     let fechaScore = {
       fecha: fecha,
@@ -395,9 +384,6 @@ async function questionsGenerator() {
     correctas.push(element.correct_answer);
 
   });
-
-  console.log(preguntas)
-  console.log(correctas)
 
 }
 
@@ -459,7 +445,6 @@ if (document.title === 'Quiz') {
 if (document.title === 'Jukebox Quiz - Results') {
   let local = JSON.parse(localStorage.getItem("mails"));
   let lastround = local[local.length - 1].score;
-  console.log(lastround)
 
   for (let x = 0; x < local.length; x++) {
     if (local[x].score == undefined) {
@@ -473,44 +458,6 @@ if (document.title === 'Jukebox Quiz - Results') {
   const points = document.getElementById('hallOfFame');
   points.innerHTML = `<img class="iconLabel" src="./assets/images/icon01.png" alt="">
   <h2 class="fontResult">Hall of Fame: </h2>`
-
-
-  //   local.sort(function (a, b) {
-  //     if (a["score"] > b["score"]) {
-  //       return 1;
-  //     }
-  //     if (a["score"] < b["score"]) {
-  //       return -1;
-  //     }
-
-  //     return 0;
-  //   });
-
-  //   local = local.slice(0, 5);
-
-  //   const table = document.getElementById('table')
-  //   table.innerHTML = `                      
-  //                       <table>
-  //                         <thead>
-  //                           <tr>
-  //                             <th>Player</th>
-  //                             <th>Date</th>
-  //                             <th>Result</th>
-  //                           </tr>
-  //                         </thead>
-  //                         <tbody>
-  //                           ${local.map((local) => `
-  //                             <tr>
-  //                               <td>${local.email}</td>
-  //                               <td>${local.fecha}</td>
-  //                               <td>${local.score}</td>
-  //                             </tr>
-  //                           `).join("")}
-  //                         </tbody>
-  //                       </table>
-  //                     `;
-
-  // }
 
 
   const partidasRef = collection(db, 'partidas');
@@ -583,8 +530,6 @@ if (document.title === "Jukebox Quiz - Home") {
       });
   });
 
-
-
 }
 
 //BOTON LOGOUT NAVBAR
@@ -592,7 +537,6 @@ if (document.title === "Jukebox Quiz - Home") {
 if (document.title === "Quiz" || document.title === 'Jukebox Quiz - Results') {
   const logout = document.getElementById("logoutButton");
   logout.addEventListener('click', () => {
-    console.log("Pinchando Logout")
     signOut(auth).then(() => {
       console.log('Logout user')
       alert("Hope to see you soon!")
@@ -641,14 +585,14 @@ if (document.title === 'Quiz') {
 if (document.title === 'Quiz') {
   document.getElementById('next').addEventListener('click', function () {
     let respuesta = document.querySelector(`input[name=answer]:checked`).value
-    console.log(respuesta);
+
     if (respuesta == "r3") {
       score++
       console.log(score);
     }
 
     page++
-    console.log(page)
+
 
     pintarQuiz();
     if (page === 9) {
@@ -656,7 +600,7 @@ if (document.title === 'Quiz') {
       document.getElementById('next').style.display = 'none';
       document.getElementById('check').classList.remove('notshow');
       page = 0;
-      console.log(page)
+
       submitForm();
 
     }

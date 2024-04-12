@@ -189,6 +189,10 @@ input[type="radio"]:checked + label{
     width: 259px;
 }
 
+#registrar{
+    margin-top: 0px;
+}
+
 /* QUESTION.HTML*/
 
 nav{
