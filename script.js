@@ -517,18 +517,115 @@ if (document.title === "Jukebox Quiz - Home") {
  
   const playAsGuestButton = document.getElementById("playAsGuest");
 
-  playAsGuestButton.addEventListener("click", () => {
-    signInWithEmailAndPassword(auth, "invitado@juqueboxquiz.com", "invitado")
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-      });
-  });
+  playAsGuestButton.addEventListener("click", async () => {
+
+      const loginEmail ="invitado@juqueboxquiz.com" ;
+      const loginPassword = "invitado";
+      let userData = document.getElementById('user-data');
+      //Call the collection in the DB
+      const docRef = doc(db, "users", loginEmail);
+      //Search a document that matches with our ref
+      const docSnap = await getDoc(docRef);
+  
+      signInWithEmailAndPassword(auth, loginEmail, loginPassword)
+        .then(() => {
+          console.log('User Signed In!')
+          loginForm.reset();
+        })
+        .then(() => {
+  
+          if (docSnap.exists()) {
+            userName = docSnap.data().username;
+            userData.style.cssText = 'display: block; background-color: #ffcfd2; width: 75%; margin: auto; padding: 5px;';
+            userData.innerHTML = `<h3>Welcome!</h3>
+                                <p>Username: ${docSnap.data().username}</p>
+                                <p>Email: ${docSnap.data().email}</p>
+                                <p>Now you are ready to play!</p>
+                                <button id="startQuiz"class="quizbutton" type="click"><a href="./question.html">Play!</a></button>
+                               `
+            userData.style.display = "block";
+            document.getElementById("playAsGuest").style.display = "none";
+            document.getElementById("login-form").style.display = "none";
+            document.getElementById("scoresBox").style.display = "block";
+  
+            //almacenamos ese mail en LOCAL STORAGE
+            let guardar = JSON.parse(localStorage.getItem("mails"));
+            let mail = [{ email: loginEmail, username: userName }];
+  
+            if (guardar === null) {
+              localStorage.setItem("mails", JSON.stringify(mail));
+            } else {
+              let newEmail = { email: loginEmail, username: userName };
+  
+              guardar.push(newEmail);
+              localStorage.setItem("mails", JSON.stringify(guardar));
+            }
+  
+  
+  
+  
+            //GRAFICA USUARIO LOGUEADO
+  
+            let fechasGrafica = [];
+            let scoreGrafica = [];
+            // Initialize Firestore
+            const db = getFirestore();
+  
+            // Reference to the "partidas" collection
+            let partidasRef = collection(db, "partidas");
+  
+            // Query to get documents where "email" is equal to the logged in user's email
+            let q = query(partidasRef, where("email", "==", loginEmail), orderBy("date", "asc"));
+  
+            // Execute the query
+            getDocs(q).then((querySnapshot) => {
+              querySnapshot.forEach((doc) => {
+                // Extract date and score and add them to fechasGrafica and scoreGrafica
+                fechasGrafica.push(doc.data().date);
+                scoreGrafica.push(doc.data().scores);
+              });
+  
+  
+  
+  
+  
+              const ctx = document.getElementById('myChart');
+              new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: [`${fechasGrafica[0]}`, `${fechasGrafica[1]}`, `${fechasGrafica[2]}`, `${fechasGrafica[3]}`],
+                  datasets: [{
+                    label: 'Correct Answers',
+                    data: [`${scoreGrafica[0]}`, `${scoreGrafica[1]}`, `${scoreGrafica[2]}`, `${scoreGrafica[3]}`],
+                    borderWidth: 1
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  aspectRatio: 1 | 1,
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }
+              });
+  
+            });
+
+  
+          } else {
+            console.log("No such document!");
+          }
+        })
+        .catch((error) => {
+          document.getElementById('msgerr').innerHTML = 'Invalid user or password';
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log('Código del error: ' + errorCode);
+          console.log('Mensaje del error: ' + errorMessage);
+        });
+    });
 
 }
 
@@ -621,6 +718,11 @@ if (document.title === 'Jukebox Quiz - Results') {
 
 
 }
+
+
+
+
+
 
 
 
