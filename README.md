@@ -1,10 +1,10 @@
 # Jukebox Quiz #
 ---
 
-<video controls>
-  <source src="./assets/video/JUKEBOX OK.mp4" type="video/mp4">
-  Tu navegador no soporta la reproducción de videos.
-</video>
+
+
+https://github.com/ChinchiGit/Jukebox-Quiz/assets/144268383/d895db52-e3de-4ac0-aa9c-d4c87c98d407
+
 
 
 🇬🇧
